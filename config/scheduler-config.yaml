@@ -19,9 +19,9 @@ agent:
 
 database:
   host: localhost
-  port: 5432
+  port: 5433
   user: postgres
-  password: postgres
+  password: "gpu123"
   database: gpu_scheduler
   sslmode: disable
   max_open_conns: 25

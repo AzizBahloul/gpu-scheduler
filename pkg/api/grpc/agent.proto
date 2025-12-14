@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package agent;
+
+option go_package = "github.com/azizbahloul/gpu-scheduler/pkg/api/grpc/generated;agent";
+
+import "google/protobuf/timestamp.proto";
+
+// Agent service for node-scheduler communication
+service AgentService {
+  rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
+  rpc Heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse);
+  rpc ReportMetrics(ReportMetricsRequest) returns (ReportMetricsResponse);
+  rpc ReceiveJobAssignment(stream JobAssignmentRequest) returns (stream JobAssignmentResponse);
+}
+
+message RegisterAgentRequest {
+  string node_id = 1;
+  string hostname = 2;
+  string ip_address = 3;
+  int32 total_gpus = 4;
+  int32 total_cpu_cores = 5;
+  int64 total_memory_mb = 6;
+  repeated GPUInfo gpus = 7;
+  map<string, string> labels = 8;
+}
+
+message RegisterAgentResponse {
+  bool success = 1;
+  string message = 2;
+  string agent_id = 3;
+}
+
+message HeartbeatRequest {
+  string node_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  repeated GPUMetrics gpu_metrics = 3;
+  double cpu_utilization = 4;
+  double memory_utilization = 5;
+  int32 active_jobs = 6;
+}
+
+message HeartbeatResponse {
+  bool acknowledged = 1;
+  repeated string commands = 2;
+}
+
+message ReportMetricsRequest {
+  string node_id = 1;
+  repeated GPUMetrics gpu_metrics = 2;
+  repeated JobMetrics job_metrics = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}
+
+message ReportMetricsResponse {
+  bool success = 1;
+}
+
+message JobAssignmentRequest {
+  string node_id = 1;
+  string status = 2;
+}
+
+message JobAssignmentResponse {
+  string job_id = 1;
+  string allocation_id = 2;
+  repeated string gpu_ids = 3;
+  int32 cpu_cores = 4;
+  int64 memory_mb = 5;
+  string image = 6;
+  repeated string command = 7;
+  repeated string args = 8;
+  map<string, string> environment = 9;
+  string script = 10;
+}
+
+message GPUInfo {
+  string gpu_id = 1;
+  int32 index = 2;
+  string model = 3;
+  int64 memory_total_mb = 4;
+  string compute_capability = 5;
+  int32 cuda_cores = 6;
+  int32 tensor_cores = 7;
+}
+
+message GPUMetrics {
+  string gpu_id = 1;
+  double utilization = 2;
+  double temperature = 3;
+  double power_usage = 4;
+  int64 memory_used_mb = 5;
+  int64 memory_free_mb = 6;
+  bool thermal_throttle = 7;
+  int32 error_count = 8;
+}
+
+message JobMetrics {
+  string job_id = 1;
+  string state = 2;
+  double gpu_utilization = 3;
+  double cpu_utilization = 4;
+  int64 memory_used_mb = 5;
+  google.protobuf.Timestamp started_at = 6;
+  string exit_code = 7;
+  string error_message = 8;
+}

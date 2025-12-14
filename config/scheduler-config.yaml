@@ -1,0 +1,64 @@
+environment: development
+
+scheduler:
+  scheduling_interval_ms: 1000
+  max_queue_size: 10000
+  enable_preemption: true
+  enable_gang_scheduling: true
+  enable_thermal_aware: true
+  thermal_threshold: 75.0
+  default_priority: 100
+
+agent:
+  heartbeat_interval_ms: 5000
+  metrics_interval_ms: 10000
+  health_check_interval_ms: 30000
+  dcgm_enabled: false
+  dcgm_host_port: localhost:5555
+  container_runtime: docker
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  database: gpu_scheduler
+  sslmode: disable
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime_mins: 30
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 10
+  min_idle_conns: 2
+
+kubernetes:
+  in_cluster: false
+  kubeconfig_path: ~/.kube/config
+  namespace: gpu-system
+
+api:
+  grpc_port: 9090
+  http_port: 8080
+  enable_tls: false
+  tls_cert_path: ""
+  tls_key_path: ""
+  cors_enabled: true
+  cors_origins: "*"
+  rate_limit_rps: 100
+
+metrics:
+  enabled: true
+  port: 9091
+  path: /metrics
+  namespace: gpu_scheduler
+
+telemetry:
+  tracing_enabled: false
+  jaeger_endpoint: http://localhost:14268/api/traces
+  profiling_enabled: false
+  profiling_port: 6060
